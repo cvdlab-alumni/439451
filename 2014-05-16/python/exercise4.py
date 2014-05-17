@@ -129,6 +129,17 @@ def diagram2cell_2(diagram,master,cell):
    #CV = replace_toAll(V,CV)
    #V = remove_double(V)
    master = V, CV
+   return master
+
+"""altro modo per farlo"""
+def diagram2cell_other(diagram,master,cell):
+   mat = diagram2cellMatrix(diagram)(master,cell)
+   diagram =larApply(mat)(diagram)
+   V1,CV1 = master
+   CV1 = [c for k,c in enumerate(CV1) if k != cell]
+   V,CV1,CV2,n12 = vertexSieve((V1,CV1),diagram)
+   CV = CV1+CV2
+   master = V, CV
    return master
 
 
@@ -143,7 +154,7 @@ toNumber_faces(diagram)
 
 
 """Test"""
-master = diagram2cell_2(diagram,master,31)
+master = diagram2cell_other(diagram,master,31)
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),CYAN,2)
 VIEW(hpc)
