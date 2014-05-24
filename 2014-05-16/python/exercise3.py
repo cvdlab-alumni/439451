@@ -32,13 +32,17 @@ from boolean import *
 """creo una funzione che applica il ciclo fusione-enumerazione-fusione"""
 
 
-#funzione di appoggio che mi consente di restituire il risultato dell'operazione
+#funzione di appoggio che mi consente di restituire il diagramma-modello con le celle numerate
 def toNumber_faces(model):
     hpc = SKEL_1(STRUCT(MKPOLS(model)))
     hpc = cellNumbering (model,hpc)(range(len(model[1])),CYAN,1)
     VIEW(hpc)
+    
+    
+    
 
-#metodo che mi permette di inserire il diagramma in diverse celle del master
+"""metodo PRONCIPALE che mi permette di INSERIRE IL SUB-DIAGRAMMA IN DIVERSE CELLE DEL MASTER, obg=SUB-DIAGRAM  model=MASTER  
+    lista=LISTA CELLE DEL MASTER SULLE QUALI VOGLIO INSERIRE IL SUBDIAGRAM"""
 def toReplicate_into_masters2cell(obg,model,lista):
     lista.sort();
     lista.reverse();
@@ -47,13 +51,20 @@ def toReplicate_into_masters2cell(obg,model,lista):
     toNumber_faces(model)
     return model
 
+
+#funzione che mi rimuove determinate celle di una diagramma
 def toRemoveCells(model,lista):
     V,CV = model
     model =  V,[cell for k,cell in enumerate(CV) if not (k in lista)]
     toNumber_faces(model)
     return model
+
+
+
+
     
-#funzione di appoggio che fonde 2 celle seguendo il principio del ciclo eureliano
+"""funzione di appoggio che fonde 2 celle seguendo il principio del ciclo eureliano"""
+#so che non is esteticamente bello questo frammento di codice, ma non ho saputo semplificarlo usando i trucchi di python (ad esempio mi is stato difficile usare il list.filter) 
 def merge_mkpol(l1,l2):
     fus = []
     j = 0
@@ -81,7 +92,7 @@ def merge_mkpol(l1,l2):
 
 
 
-#questa funzione mi unisce le celle di un diagramma, utile se voglio inserire un diagramma x dentro a una serie di celle di un diagramma y
+"""questa funzione mi unisce le celle di un diagramma y, utile se voglio inserire un diagramma x dentro a una serie di celle di un diagramma y"""
 def union_cell(model,lista_cells):
     V,CV = model
     CVn = []
@@ -131,5 +142,5 @@ toNumber_faces(master)
 #inseriamo il 3-array del diagram dentro alle celle unite
 master = toRemoveCells(toReplicate_into_masters2cell(diagram,master,[30]),[57])
 
-#VIEW(STRUCT(MKPOLS(master)))
+VIEW(STRUCT(MKPOLS(master)))
     

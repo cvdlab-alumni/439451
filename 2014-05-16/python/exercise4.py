@@ -74,7 +74,7 @@ def get_indexes(el,lst):
         i=  i+1
     return ind
 
-#funzione che sostituisce tutti gli elementi in el se questi sono presenti nella lista passata come secondo parametro
+#funzione che sostituisce tutti gli elementi in el se questi sono presenti nella lista passata come secondo parametro (app)
 def replace(el,app,lst):
     res = []
     for cell in lst:
@@ -100,22 +100,8 @@ def replace_toAll(V,CV):
 
 
 
-def diagram2cellMatrix(diagram):
-   def diagramToCellMatrix0(master,cell):
-      wdw = min(diagram[0]) + max(diagram[0])         # window3D
-      cV = [master[0][v] for v in master[1][cell]] #mi da tutti i vertici coinvolti nelle celle
-      vpt = min(cV) + max(cV)                      # viewport3D
-      mat = zeros((4,4))
-      mat[0,0] = (vpt[3]-vpt[0])/(wdw[3]-wdw[0])
-      mat[0,3] = vpt[0] - mat[0,0]*wdw[0]
-      mat[1,1] = (vpt[4]-vpt[1])/(wdw[4]-wdw[1])
-      mat[1,3] = vpt[1] - mat[1,1]*wdw[1]
-      mat[2,2] = (vpt[5]-vpt[2])/(wdw[5]-wdw[2])
-      mat[2,3] = vpt[2] - mat[2,2]*wdw[2]
-      mat[3,3] = 1
-      return mat
-   return diagramToCellMatrix0
 
+#funzione versione 1
 """funzione da ridefinire"""
 def diagram2cell_2(diagram,master,cell):
    mat = diagram2cellMatrix(diagram)(master,cell)
@@ -131,6 +117,7 @@ def diagram2cell_2(diagram,master,cell):
    master = V, CV
    return master
 
+#funzione versione 2
 """altro modo per farlo"""
 def diagram2cell_other(diagram,master,cell):
    mat = diagram2cellMatrix(diagram)(master,cell)
@@ -143,6 +130,12 @@ def diagram2cell_other(diagram,master,cell):
    return master
 
 
+
+
+
+
+"""*** TEST ***"""
+
 master = assemblyDiagramInit([5,5,2])([[.3,3.2,.1,5,.3],[.3,4,.1,2.9,.3],[.3,2.7]])
 Vm,CVm = master
 toNumber_faces(master)
@@ -153,7 +146,7 @@ diagram = Vd,[cell for k,cell in enumerate(CVd) if not (k in [2])]
 toNumber_faces(diagram)
 
 
-"""Test"""
+
 master = diagram2cell_other(diagram,master,31)
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),CYAN,2)
