@@ -21,7 +21,7 @@ DRSM = COMP([STRUCT,MKPOLS])
 #funzione che mi permette di numerare le celle
 def numbers_faces(model):
     hpc = SKEL_1(STRUCT(MKPOLS(model)))
-    return cellNumbering (model,hpc)(range(len(model[1])),RED,1)
+    return cellNumbering (model,hpc)(range(len(model[1])),RED,2)
 
 #funzione che mi permette (passando in maniera opportuna la giusta lista) di inserire un sub_diagram in diverse celle del master
 def insert_into_cell(obg,model,lista):
@@ -55,6 +55,19 @@ def larMoltiply(model,num,space,assi):
         CV = CAT(aggCV)
         return (V,CV)
 
+
+#funzione che mi permette di colorare alcune celle del master con TEXTURE
+def color_texture(diagram,text,cells):
+    for k in cells:
+        diagram[k] = TEXTURE(text)(diagram[k])
+    return diagram
+
+
+#funzione che mi permette di colorare alcune celle del master
+def color_cells(diagram,values,cells):
+    for k in cells:
+        diagram[k] = COLOR([values[0]/255.0,values[1]/255.0,values[2]/255.0])(diagram[k])
+    return diagram
 
 
 """NOTA IMPORTANTISSIMA: IO ED ALCUNI DEI MIEI COLLEGHI, AGGIORNANDO IL LAR, ABBIAMO RISCONTRATO ALCUNI PROBLEMI NELL'ESEGUIRE IL 
@@ -240,9 +253,19 @@ master_apartment =  insert_into_cell(windows_double,master_apartment,[70,60,34])
 hpc_ma = numbers_faces(master_apartment)
 #VIEW(hpc_ma)
 
-master_apartment_c = COLOR([0.9686,0.9098,0.6235])(DRSM(master_apartment))
-#master_apartment_c = TEXTURE('C:\temp_inf_teorica\gc\muro2.jpg')(DRSM(master_apartment))
-VIEW(master_apartment_c)
+"""incomincio a colorare alcune parti"""
+master_apartment_P = MKPOLS(master_apartment)
+
+
+master_apartment_P = color_texture(master_apartment_P,'../images/muro.png',[3,48,54,80,86]+range(257,262)+range(297,354)+range(354,388))
+master_apartment_P = color_texture(master_apartment_P,'../images/muro.png',[1,5,10,19,28,37,46,50,52,64,73,78])
+master_apartment_P = color_texture(master_apartment_P,'../images/muro_bianco.png',[12,14,21,30,32,39,57,8,23,41,60,69,62,71]+range(262,272)+range(277,297))
+master_apartment_P = color_cells(master_apartment_P,[210,105,30],range(110,172)+[56,82,90,91,95,96,97,88,93,100,101,103,105,106,108])
+master_apartment_P = color_cells(master_apartment_P,[210,105,30],range(197,257)+[188,193,173,178,185,186,190,191,196,195,180,181,182,175,176])
+
+
+apartment = STRUCT(master_apartment_P)
+VIEW(apartment)
 
 
 
