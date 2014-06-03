@@ -33,15 +33,18 @@ body {
 		// once everything is loaded, we run our Three.js stuff.
 		$(function() {
 
-			var stats = initStats();
+			
+		var stats = initStats();
 
-			var scene = new THREE.Scene(); //creo una scena
+			scene = new THREE.Scene(); //creo una scena
 
 			// create a camera, which defines where we're looking at.
-			var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+			var camera = new THREE.PerspectiveCamera(45, window.innerWidth
+					/ window.innerHeight, 0.1, 1000);
 
 			// create a inspectedCamera
-			var inspectedCamera = new THREE.PerspectiveCamera(100,window.innerWidth/window.innerHeight, 10, 400);
+			var inspectedCamera = new THREE.PerspectiveCamera(100,
+					window.innerWidth / window.innerHeight, 10, 400);
 
 			// create a render and set the size
 			var renderer = new THREE.WebGLRenderer(); //bisogna rendeizzare la nostra scena secondo una camera
@@ -55,95 +58,113 @@ body {
 			// create the ground plane
 			var planeGeometry = new THREE.PlaneGeometry(400, 400);
 			var planeMaterial = new THREE.MeshLambertMaterial({
-				color : 0x1cd21c,    
+				color : 0x1cd21c,
 				wireframe : false
-			}); /*0x228b22... metto il bianco perchè applico qualsiasi colore di pointcolor sul piano bianco (e non lo posso fare 
-					          sullo stesso piano colorato di verde, altrimenti sim mischierebbero i colori, invece  il bianco
-					          accontenta tutti)*/
+			}); /*0x228b22... metto il bianco perchè applico qualsiasi colore di pointcolor sul piano bianco (e non lo posso fare
+							          sullo stesso piano colorato di verde, altrimenti sim mischierebbero i colori, invece  il bianco
+							          accontenta tutti)*/
 			//con queste 2 variabili definisco, geometria e materiale
 			plane = new THREE.Mesh(planeGeometry, planeMaterial);
 			plane.receiveShadow = true; //per ricevere l'ombra
-			
+
 			// rotate and position the plane
 			plane.rotation.x = -0.5 * Math.PI; //ruoto sull'asse x il nostro oggetto piano di pi/2
 			//plane.rotation.y= -0.5*Math.PI; //ruoto sull'asse y il nostro oggetto piano di pi/2
 			//plane.rotation.z=-0.1*Math.PI;
 			//plane.position.set(15,0,0); //lo traslo di x
-		
+
 			// add the plane to the scene
 			scene.add(plane);
-			
+
 			trees = new THREE.Object3D();
 			scene.add(trees);
-			
+
 			var tree = new THREE.Object3D();
-			tree.position.set(30,0,30); //sarebbe inutile alla fine perchè viene applicata la funzione render()
+			tree.position.set(30, 0, 30); //sarebbe inutile alla fine perchè viene applicata la funzione render()
+			//add cylinder
+			var cylinderGeometry = new THREE.CylinderGeometry(2.5, 2.5, 30, 25,25);
+			var cylinderMaterial = new THREE.MeshLambertMaterial({
+				color : 0x993300,
+				wireframe : false
+			}); //MeshBasicMaterial
+			var tronco = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+			tronco.castShadow = true;
+			tronco.position.set(0, 15, 0);
+			tree.add(tronco)
+			//scene.add(tronco);
+			// add the chioma
+			var chiomaGeometry = new THREE.SphereGeometry(15, 10, 20);
+			var chiomaMaterial = new THREE.MeshLambertMaterial({
+				color : 0x808000,
+				wireframe : false
+			});
+			var chioma = new THREE.Mesh(chiomaGeometry, chiomaMaterial);
+			chioma.castShadow = true;
+			chioma.position.set(0, 30 + 15, 0);
+			tree.add(chioma)
+			//scene.add(chioma);
+			var radiusChioma = chioma.geometry.parameters.radius;
 
-		function generateTree(tree) {
-				
-				//add cylinder
-				var cylinderGeometry = new THREE.CylinderGeometry(2.5, 2.5, 30,
-						25, 25);
-				var cylinderMaterial = new THREE.MeshLambertMaterial({     
-					color : 0x993300,
-					wireframe : false
-				});  //MeshBasicMaterial
-				var tronco = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-				tronco.castShadow = true;
-				tronco.position.set(0, 15, 0);
-				tree.add(tronco)
-				//scene.add(tronco);
-				// add the chioma
-				var chiomaGeometry = new THREE.SphereGeometry(15, 10, 20);
-				var chiomaMaterial = new THREE.MeshLambertMaterial({
-					color : 0x808000,
-					wireframe : false
-				});
-				var chioma = new THREE.Mesh(chiomaGeometry, chiomaMaterial);
-				chioma.castShadow = true;
-				chioma.position.set(0, 30 + 15, 0);
-				tree.add(chioma)
-				//scene.add(chioma);
-				var radiusChioma = chioma.geometry.parameters.radius;
-
-				function generateApples(num) {
-					var i;
-					for (i = 0; i < num; ++i) {
-						var melaGeometry = new THREE.SphereGeometry(1, 10, 20);
-						var melaMaterial = new THREE.MeshBasicMaterial({
-							color : 0xFF007F,
-							wireframe : false
-						});
-						mela = new THREE.Mesh(melaGeometry, melaMaterial);
-						mela.castShadow = true;
-						var angle1 = Math.random() * (Math.PI);
-						var angle2 = Math.random() * (Math.PI - (-Math.PI))
-								+ (-Math.PI);
-						mela.position.set(radiusChioma * (Math.sin(angle1))
-								* (Math.cos(angle2)), radiusChioma
-								* (Math.sin(angle1)) * (Math.sin(angle2)),
-								radiusChioma * (Math.cos(angle1)));
-						chioma.add(mela);
-					}
+			function generateApples(num) {
+				var i;
+				for (i = 0; i < num; ++i) {
+					var melaGeometry = new THREE.SphereGeometry(1, 10, 20);
+					var melaMaterial = new THREE.MeshBasicMaterial({
+						color : 0xFF007F,
+						wireframe : false
+					});
+					mela = new THREE.Mesh(melaGeometry, melaMaterial);
+					mela.castShadow = true;
+					var angle1 = Math.random() * (Math.PI);
+					var angle2 = Math.random() * (Math.PI - (-Math.PI))
+							+ (-Math.PI);
+					mela.position.set(radiusChioma * (Math.sin(angle1))
+							* (Math.cos(angle2)), radiusChioma
+							* (Math.sin(angle1)) * (Math.sin(angle2)),
+							radiusChioma * (Math.cos(angle1)));
+					chioma.add(mela);
 				}
-
-				generateApples(60);
-				tree.castShadow = true;
-				trees.add(tree);
 			}
-			
-			generateTree(tree);
-			
+			generateApples(60);
+			trees.add(tree);
 
+			//add lampione
+			
+			lampione = new THREE.Object3D();
+			scene.add(lampione);
+			
+			
+			var lampCylinderGeometry = new THREE.CylinderGeometry(2, 2, 30, 15,15);
+			var lampCylinderMaterial =  new THREE.MeshBasicMaterial({
+				color : 0x404040,
+				wireframe : false
+			}); //MeshBasicMaterial
+			var lampCylinder = new THREE.Mesh(lampCylinderGeometry, lampCylinderMaterial);
+			lampCylinder.castShadow = true;
+			lampione.add(lampCylinder);
+			
+			var lampSphereGeometry = new THREE.SphereGeometry(8, 5, 5);
+			var lampSphereMaterial = new THREE.MeshBasicMaterial({
+				color : 0xD8BFD8,
+				wireframe : false
+			});
+			lampSphere = new THREE.Mesh(lampSphereGeometry, lampSphereMaterial);
+			lampSphere.castShadow = true;
+			lampSphere.position.set(0,20,0)
+			lampione.add(lampSphere)
+			
+			lampione.position.set(60,15,-100)
+			
+			
 			//add leva
 			var cubeGeometryLeva = new THREE.BoxGeometry(3, 80, 1); //leva
 			var cubeMaterialLeva = new THREE.MeshBasicMaterial({
 				color : 0x3D2B1F,
 				wireframe : false
 			});
-			var leva = new THREE.Mesh(cubeGeometryLeva, cubeMaterialLeva);
+			leva = new THREE.Mesh(cubeGeometryLeva, cubeMaterialLeva);
 			leva.castShadow = true;
-			leva.position.set(-100,40, -100);
+			leva.position.set(-100, 40, -100);
 
 			scene.add(leva);
 
@@ -151,18 +172,17 @@ body {
 			camera.position.set(-80, 160, 30);
 			camera.up = new THREE.Vector3(0, 1, 0);
 			camera.lookAt(scene.position);
-			
+
 			var ambiColor = "#1c1c1c";
-		    var ambientLight = new THREE.AmbientLight(ambiColor);
-		    scene.add(ambientLight);
-			
-		  
+			var ambientLight = new THREE.AmbientLight(ambiColor);
+			scene.add(ambientLight);
+
 			var pointColor = "#ffffff";
 			var directionalLight = new THREE.DirectionalLight(pointColor);
 			//directionalLight.position.set(-40, 60, -10);
 			directionalLight.castShadow = true;
 			directionalLight.shadowCameraNear = 2;
-			directionalLight.shadowCameraFar = 250;
+			directionalLight.shadowCameraFar = 2 * (plane.geometry.parameters.height);
 			directionalLight.shadowCameraLeft = -220;
 			directionalLight.shadowCameraRight = 220;
 			directionalLight.shadowCameraTop = 220;
@@ -173,15 +193,17 @@ body {
 			directionalLight.shadowMapWidth = 1024; //precisione
 
 			scene.add(directionalLight);
-			
-			 // add a small sphere simulating the pointlight
-		    var sphereLight = new THREE.SphereGeometry(0.5);
-		    var sphereLightMaterial = new THREE.MeshBasicMaterial({color: 0xFDE910});
-		    var dio_elio = new THREE.Mesh(sphereLight, sphereLightMaterial);
-		    dio_elio.castShadow = true;
 
-		    //sphereLightMesh.position = new THREE.Vector3(3, 20, 3);
-		    scene.add(dio_elio);
+			// add a small sphere simulating the pointlight
+			var sphereLight = new THREE.SphereGeometry(0.5);
+			var sphereLightMaterial = new THREE.MeshBasicMaterial({
+				color : 0xFDE910
+			});
+			var dio_elio = new THREE.Mesh(sphereLight, sphereLightMaterial);
+			dio_elio.castShadow = true;
+
+			//sphereLightMesh.position = new THREE.Vector3(3, 20, 3);
+			scene.add(dio_elio);
 
 			// position and point the camera to the center of the scene
 			inspectedCamera.position.set(10, 250, -80);
@@ -215,7 +237,7 @@ body {
 				this.pointColor = pointColor;
 				this.onlyShadow = false;
 				this.intensity = 0.5;
-		        this.debug = false;
+				this.debug = false;
 			};
 
 			var invert = false;
@@ -225,7 +247,7 @@ body {
 			asseZ = gui.add(controls, 'asseZ', -1, 1);
 			rotationSpeed = gui.add(controls, 'rotationSpeed', 0.0, 0.5);
 			var axisControl = gui.add(controls, 'showAxisHelper');
-			
+
 			gui.addColor(controls, 'pointColor').onChange(function(e) {
 				directionalLight.color = new THREE.Color(e);
 			});
@@ -238,10 +260,9 @@ body {
 				directionalLight.shadowCameraVisible = e;
 			});
 
-			gui.add(controls, 'onlyShadow').onChange(function (e) {
-		          directionalLight.onlyShadow = e;
-		    });
-			
+			gui.add(controls, 'onlyShadow').onChange(function(e) {
+				directionalLight.onlyShadow = e;
+			});
 
 			var cameraControl = gui.add(controls, 'inspectedCamera');
 
@@ -273,40 +294,62 @@ body {
 				stats.update();
 				trackballControls.update();
 				cameraHelper.update();
-				
-				if (!(invert) && (step+controls.rotationSpeed) < Math.PI / 2.0) {
+
+				if (!(invert)
+						&& (step + controls.rotationSpeed) < Math.PI / 2.0) {
 					step += controls.rotationSpeed;
 					leva.rotation.x = step;
-					leva.position.z = (leva.geometry.parameters.height/2.0)*Math.sin(step)-100;
-					leva.position.y = (leva.geometry.parameters.height/2.0)*Math.cos(step);
+					leva.position.z = (leva.geometry.parameters.height / 2.0)
+							* Math.sin(step) - 100;
+					leva.position.y = (leva.geometry.parameters.height / 2.0)
+							* Math.cos(step);
 				}
-				if (((step+controls.rotationSpeed) >= Math.PI / 2.0) && !(invert)) {
-					step = Math.PI/2.0;
+				if (((step + controls.rotationSpeed) >= Math.PI / 2.0)
+						&& !(invert)) {
+					step = Math.PI / 2.0;
 					leva.rotation.x = step;
-					leva.position.z = (leva.geometry.parameters.height/2.0)*Math.sin(step)-100;
-					leva.position.y = (leva.geometry.parameters.height/2.0)*Math.cos(step);
+					leva.position.z = (leva.geometry.parameters.height / 2.0)
+							* Math.sin(step) - 100;
+					leva.position.y = (leva.geometry.parameters.height / 2.0)
+							* Math.cos(step);
 					invert = true;
 				}
-				if (invert && (step- controls.rotationSpeed) > -Math.PI / 2.0) {
+				if (invert && (step - controls.rotationSpeed) > -Math.PI / 2.0) {
 					step = step - controls.rotationSpeed;
 					leva.rotation.x = step;
-					leva.position.z = (leva.geometry.parameters.height/2.0)*Math.sin(step)-100;
-					leva.position.y = (leva.geometry.parameters.height/2.0)*Math.cos(step);
+					leva.position.z = (leva.geometry.parameters.height / 2.0)
+							* Math.sin(step) - 100;
+					leva.position.y = (leva.geometry.parameters.height / 2.0)
+							* Math.cos(step);
 				}
-				if (((step - controls.rotationSpeed) <= -Math.PI/2.0) && invert) {
-					step = -Math.PI/2.0;
+				if (((step - controls.rotationSpeed) <= -Math.PI / 2.0)
+						&& invert) {
+					step = -Math.PI / 2.0;
 					leva.rotation.x = step;
-					leva.position.z = (leva.geometry.parameters.height/2.0)*Math.sin(step)-100;
-					leva.position.y = (leva.geometry.parameters.height/2.0)*Math.cos(step);
+					leva.position.z = (leva.geometry.parameters.height / 2.0)
+							* Math.sin(step) - 100;
+					leva.position.y = (leva.geometry.parameters.height / 2.0)
+							* Math.cos(step);
 					invert = false;
 				}
-				step2+= 0.1;
-				tree.position.x = controls.asseX * planeGeometry.parameters.width / 2.0;
-				tree.position.z = controls.asseZ * planeGeometry.parameters.height / 2.0;
+				step2 += 0.1;
+				tree.position.x = controls.asseX
+						* planeGeometry.parameters.width / 2.0;
+				tree.position.z = controls.asseZ
+						* planeGeometry.parameters.height / 2.0;
 				dio_elio.position.z = -1;
-		        dio_elio.position.y = (157 * (Math.sin(step2/3)));//bisogna aumentare questo per la quota
-		        dio_elio.position.x =  (156 * (Math.cos(step2/3))); //anche questo meglio cambiarlo
-		        directionalLight.position = dio_elio.position;
+				dio_elio.position.y = (157 * (Math.sin(step2 / 3)));//bisogna aumentare questo per la quota
+				dio_elio.position.x = (200 * (Math.cos(step2 / 3))); //anche questo meglio cambiarlo
+				directionalLight.position = dio_elio.position;
+				if (directionalLight.position.y>=0) {
+					lampSphere.material.color.b = 0.8470588235294118;
+					lampSphere.material.color.g = 0.7490196078431373;
+					lampSphere.material.color.r = 0.8470588235294118;
+				} else {
+					lampSphere.material.color.b = 0.4;
+					lampSphere.material.color.g = 1.0;
+					lampSphere.material.color.r = 1.0;
+				}
 
 				requestAnimationFrame(render2);
 				renderer.render(scene, renderCamera);
@@ -320,14 +363,13 @@ body {
 				renderer.render(scene, camera);
 			}
 
-			
 			//direction: up,down,right,left,up-left,up-right,down-left,down-right,right-up,right-down,left-up,left-down
 			function generateTrees(direction, num) {
 				var i;
 				var step = 0.0;
 				for (i = 0; i < num; ++i) {
 					//ripartiamo da qua
-					var suptree = new THREE.Object3D();
+					var suptree = tree.clone();
 					if (step <= plane.geometry.parameters.height / 2
 							&& direction === "up") {
 						suptree.position.x = step;
@@ -356,17 +398,17 @@ body {
 						step = step - 42.5;
 					} else if (step <= plane.geometry.parameters.height / 2
 							&& direction === "right-up") {
-						suptree.position.z = plane.geometry.parameters.width / 2;
+						suptree.position.z = plane.geometry.parameters.width / 2-80;
 						suptree.position.x = step;
 						step = step + 42.5;
 					} else if (step >= -plane.geometry.parameters.height / 2
 							&& direction === "right-down") {
-						suptree.position.z = plane.geometry.parameters.width / 2;
+						suptree.position.z = plane.geometry.parameters.width / 2-80;
 						suptree.position.x = step;
 						step = step - 42.5;
 					} else if (step >= -plane.geometry.parameters.width / 2
 							&& direction === "up-left") {
-						suptree.position.x = plane.geometry.parameters.height / 2;
+						suptree.position.x = plane.geometry.parameters.height / 2-60;
 						suptree.position.z = step;
 						step = step - 42.5;
 					} else if (step <= plane.geometry.parameters.width / 2
@@ -376,7 +418,7 @@ body {
 						step = step + 42.5;
 					} else if (step >= -plane.geometry.parameters.width / 2
 							&& direction === "down-left") {
-						suptree.position.x = -plane.geometry.parameters.height / 2;
+						suptree.position.x = -plane.geometry.parameters.height / 2+60;
 						suptree.position.z = step;
 						step = step - 42.5;
 					} else if (step <= plane.geometry.parameters.width / 2
@@ -386,7 +428,7 @@ body {
 						step = step + 42.5;
 					}
 
-					generateTree(suptree);
+					trees.add(suptree);
 
 				}
 			}
@@ -394,20 +436,20 @@ body {
 			function generateForest() {
 				generateTrees("up", 5);
 				generateTrees("down", 5);
-				generateTrees("right",5);
-				generateTrees("left",5);
-				//generateTrees("left-up", 5);
+				//generateTrees("right", 5);
+				//generateTrees("left", 5);
+				generateTrees("left-up", 5);
 				//generateTrees("left-down", 5);
-				//generateTrees("right-up", 5);
-				//generateTrees("right-down", 5);
-				//generateTrees("up-left",5);
+				generateTrees("right-up", 5);
+				generateTrees("right-down", 5);
+				generateTrees("up-left",5);
 				//generateTrees("up-right",5);
-				//generateTrees("down-left",5);
+				generateTrees("down-left",5);
 				//generateTrees("down-right",5);
 			}
 
 			generateForest();
-			
+
 			//render();
 			render2();
 			//render3();
