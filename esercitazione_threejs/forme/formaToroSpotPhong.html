@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Exercise - Tree</title>
+<style>
+body {
+	margin: 0;
+	overflow: hidden;
+	
+}
+
+#stats { /* Align stats top-left */
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+</style>
+</head>
+<body>
+	<!-- JavaScript libraries -->
+	<script
+		src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js">
+		/* da una pagina vuota */
+	</script>
+	<script
+		src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script
+		src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+	<script
+		src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+	<script src="assets/libs/TrackballControls.js"></script>
+	<!-- Javascript code that runs our Three.js examples -->
+	<script>
+		// once everything is loaded, we run our Three.js stuff.
+		$(function() {
+
+			
+			var stats = initStats();
+
+			scene = new THREE.Scene(); //creo una scena
+
+			// create a camera, which defines where we're looking at.
+			var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+
+			// create a render and set the size
+			var renderer = new THREE.WebGLRenderer(); //bisogna rendeizzare la nostra scena secondo una camera
+
+			renderer.setClearColor(new THREE.Color(0xEEEEEE)); //puliamo lo sfondo di un colore molto chiaro
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.shadowMapEnabled = true;
+			// create trackball controls
+			var trackballControls = new THREE.TrackballControls(camera);
+
+			// create the ground plane
+			var planeGeometry = new THREE.PlaneGeometry(80, 80);
+			var planeMaterial = new THREE.MeshBasicMaterial({
+				color : 0x1cd21c,
+				wireframe : false
+			}); 
+			plane = new THREE.Mesh(planeGeometry, planeMaterial);
+			plane.receiveShadow = true;
+
+			// rotate and position the plane
+			plane.rotation.x = -0.5 * Math.PI; 
+			// add the plane to the scene
+			scene.add(plane);
+			
+			
+			
+			var toroGeometry = new THREE.TorusGeometry( 10, 8, 16, 8 );
+			var toroMaterial = new THREE.MeshPhongMaterial({
+				color : 0x00A86B,
+				wireframe : false
+			});
+			var toro = new THREE.Mesh(toroGeometry, toroMaterial);
+			toro.rotation.x = Math.PI/2.0;
+			toro.castShadow = true;
+			toro.position.set(0,20,0);
+			scene.add(toro);
+			
+			camera.position.set(-20,30,40);
+		     //camera.lookAt(new THREE.Vector3(10, 0, 0));
+			 /*camera.position.set(-20,30,40);
+		      camera.lookAt(new THREE.Vector3(10, 0, 0))*/
+		     camera.up = new THREE.Vector3(0, 1, 0);
+			 camera.lookAt(scene.position);
+
+			
+			/*var ambiColor = "#0c0c0c";
+			var ambientLight = new THREE.AmbientLight(ambiColor);
+			scene.add(ambientLight);*/
+
+			var spotLight = new THREE.SpotLight(0xFFFFFF);
+			spotLight.position.set(0,100,0);
+		    spotLight.target = toro;
+		    //spotLight.distance = 215;
+		    spotLight.castShadow = true; 
+		    //spotLight.intensity = 0.8;
+		   
+		    spotLight.angle = 0.4;
+		    spotLight.exponent = 30;
+		    spotLight.shadowDarkness = 1;
+
+			scene.add(spotLight);
+
+			var spotLightHelper = new THREE.SpotLightHelper(spotLight,0.5);
+			scene.add(spotLightHelper);
+			
+			 // add the output of the renderer to the html element
+      		$('body').append(renderer.domElement);
+
+			// add axis helper
+			var axisHelper = new THREE.AxisHelper(3);
+			scene.add(axisHelper);
+
+			
+
+			var controls = new function() {
+				this.ambient = toroMaterial.ambient.getHex();
+				this.rotationSpeed = 0.0;
+				this.showAxisHelper = true;
+				this.spotLight = false;
+				this.spotLightHelper = true;
+				this.specular = toroMaterial.specular.getHex();
+			    this.shininess = toroMaterial.shininess;
+				this.overdraw = toroMaterial.overdraw;
+				this.opacity = toroMaterial.opacity;
+			    this.transparent = toroMaterial.transparent;
+		        this.visible = toroMaterial.visible;
+		        this.color = toroMaterial.color.getStyle();
+		        this.side = "front";
+		        this.emissive = toroMaterial.emissive.getHex();
+			};
+
+			
+			
+			var gui = new dat.GUI();
+			
+			var spGui = gui.addFolder("Mesh");
+			
+			var rotationSpeed = spGui.add(controls, 'rotationSpeed', 0.0, 0.5);
+			var axisControl = spGui.add(controls, 'showAxisHelper');
+			
+			spGui.add(controls,'spotLight').onChange(function(e) {
+				spotLight.shadowCameraVisible = e;
+			});
+			
+			spGui.add(controls,'spotLightHelper').onChange(function(e) {
+				(e) ? scene.add(spotLightHelper) : scene.remove(spotLightHelper);
+			});
+			
+		    spGui.add(controls, 'opacity', 0, 1).onChange(function(e) {
+				toroMaterial.opacity = e
+			});
+
+			spGui.add(controls, 'transparent').onChange(function(e) {
+				toroMaterial.transparent = e
+			});
+	
+			spGui.addColor(controls, 'emissive').onChange(function(e) {
+				toroMaterial.emissive = new THREE.Color(e)
+			});
+
+			spGui.addColor(controls, 'specular').onChange(function(e) {
+				toroMaterial.specular = new THREE.Color(e)
+			});
+
+			spGui.add(controls, 'shininess', 0, 200).onChange(function(e) {
+				toroMaterial.shininess = e
+			});
+
+			spGui.add(controls, 'visible').onChange(function(e) {
+				toroMaterial.visible = e
+			});
+
+			spGui.addColor(controls, 'ambient').onChange(function(e) {
+				toroMaterial.ambient = new THREE.Color(e)
+			});
+
+			spGui.add(controls, 'side', [ "front", "back", "double" ])
+					.onChange(function(e) {
+						console.log(e);
+						switch (e) {
+						case "front":
+							toroMaterial.side = THREE.FrontSide;
+							break;
+						case "back":
+							toroMaterial.side = THREE.BackSide;
+							break;
+						case "double":
+							toroMaterial.side = THREE.DoubleSide
+							break;
+						}
+						toroMaterial.needsUpdate = true;
+					});
+
+			spGui.addColor(controls, 'color').onChange(function(e) {
+				toroMaterial.color.setStyle(e)
+			});
+
+			axisControl.onChange(function(value) {
+				axisHelper.visible = value;
+			});
+
+			var step = 0.0;
+			function render2() {
+				stats.update();
+				trackballControls.update();
+				//spotLightHelper.update();
+				step += controls.rotationSpeed;
+				//toro.rotation.x = step;
+				//toro.rotation.y = step;
+				toro.rotation.z = step;
+				requestAnimationFrame(render2);
+				renderer.render(scene, camera);
+			}
+
+			//render();
+			render2();
+			//render3();
+
+			//renderer.render(scene, camera);
+			function initStats() {
+				var stats = new Stats(); //istanziare un oggetto stats
+				stats.setMode(0); // 0: fps, 1: ms
+				$('body').append(stats.domElement);
+				return stats;
+			}
+
+		});
+	</script>
+</body>
+</html>
